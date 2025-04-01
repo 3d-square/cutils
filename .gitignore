@@ -1,4 +1,5 @@
 obj/*
 btree/*
 **/.so
-*/.o
+*/*.o
+*/test*
