@@ -2,7 +2,6 @@
 #include <cutils/list.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #define node_get_val(node) (((key_val *)(node->val))->val)
 #define node_get_key(node) (((key_val *)(node->val))->key)
@@ -45,7 +44,7 @@ key_val *map_put(map m, char *key, void *val){
    if(m->buckets[hashv] == NULL){
       key_val *keyval = alloc_key_val(key, val);
       m->buckets[hashv] = list_insert(NULL, keyval);
-      m->size++;
+
       return keyval;
    }
 
@@ -62,7 +61,6 @@ key_val *map_put(map m, char *key, void *val){
    key_val *keyval = alloc_key_val(key, val);
    
    list_insert(prev, keyval);
-   m->size++;
 
    return keyval;
 }
@@ -88,7 +86,7 @@ void *map_get(map m, char *key){
    list curr = m->buckets[hashv];
 
    while(curr){
-      if(strcmp(key, node_get_key(curr)) == 0){
+      if(strcmp(key, node_get_val(curr))){
          return node_get_val(curr);
       }
       curr = curr->next;
@@ -127,86 +125,8 @@ int map_delete_key(map m, char *key){
       if(strcmp(key, ((key_val *)(curr->val))->key) == 0){
          key_val *data = list_remove(m->buckets[hashv], i);
          map_free_key_val(m, data);
-         m->size--;
          return 1;
       }
    }
    return 0;
-}
-
-// Iterable functions
-
-map_iter map_create_iter(map m){
-   map_iter iter = {
-      .m = m,
-      .bucket = -1,
-      .curr = NULL,
-      .done = 0,
-   };
-
-   map_iter_next(&iter);
-
-   return iter;
-}
-   
-int map_has_next(map_iter *iter){
-   if(iter->finished){
-      iter->done = 1;
-      return 0;
-   }
-   
-   if(iter->done){
-      return 0;
-   }
-
-   if(iter->curr){
-      if(iter->curr->next){
-         return 1;
-      }
-   }
-
-   for(int i = iter->bucket + 1; i < MAPSIZE; ++i){
-      if(iter->m->buckets[i]){
-         return 1;
-      }
-   }
-
-   iter->finished = 1;
-   return 1;
-}
-
-key_val *map_iter_data(map_iter *iter){
-   if(iter->done){
-      fprintf(stderr, "trying to get the data from a null obj");
-   }
-
-   if(iter->curr){
-      return (key_val *)iter->curr->val;
-   }
-
-   return NULL;
-}
-
-void map_iter_next(map_iter *iter){
-   if(iter->done){
-      return;
-   }
-
-   if(iter->curr){
-      if(iter->curr->next){
-         iter->curr = iter->curr->next;
-         return;
-      }
-   }
-
-   for(int i = iter->bucket + 1; i < MAPSIZE; ++i){
-      if(iter->m->buckets[i]){
-         iter->curr = iter->m->buckets[i];
-         iter->bucket = i;
-         return;
-      }
-   }
-
-   iter->done = 1;
-   iter->bucket = -1;
 }
