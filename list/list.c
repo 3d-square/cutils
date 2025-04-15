@@ -59,17 +59,12 @@ list list_remove(list head, int index, void **data){
 
    if(index == 0){
       list tmp = head;
-      printf("here1\n");
       head = head->next;
-      printf("here2\n");
       if(head){
          head->prev = NULL;
       }
-      printf("here3\n");
       *data = tmp->val;
-      printf("here5\n");
       free(tmp);
-      printf("here6\n");
       return head;
    }
 
