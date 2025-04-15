@@ -8,7 +8,7 @@ all: $(OBJS)
 obj/list.o: list/list.c list/list.h
 	gcc -c -fPIC $(CFLAGS) list/list.c -o obj/list.o
 
-obj/map.o: map/map.o map/map.h
+obj/map.o: map/map.o map/map.h list/list.h
 	gcc -c -fPIC $(CFLAGS) map/map.c -o obj/map.o
 
 obj/sb.o: sb/stringbuilder.c sb/stringbuilder.h

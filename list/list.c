@@ -50,15 +50,27 @@ list list_insert(list head, void *val){
    return head;
 }
 
-void *list_remove(list head, int index){
+list list_remove(list head, int index, void **data){
    list curr = head;
-   void *val;
+   *data = NULL;
    if(head == NULL){
       return NULL;
    }
 
    if(index == 0){
+      list tmp = head;
+      printf("here1\n");
       head = head->next;
+      printf("here2\n");
+      if(head){
+         head->prev = NULL;
+      }
+      printf("here3\n");
+      *data = tmp->val;
+      printf("here5\n");
+      free(tmp);
+      printf("here6\n");
+      return head;
    }
 
   while(index > 0 && curr){
@@ -78,10 +90,10 @@ void *list_remove(list head, int index){
       curr->next->prev = curr->prev;
    }
 
-   val = curr->val;
+   *data = curr->val;
    free(curr);
 
-   return val;
+   return head;
 }
 
 list list_delete(list head, int index, list_free del){

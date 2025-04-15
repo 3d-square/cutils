@@ -109,7 +109,8 @@ void map_destroy(map m){
          list curr = m->buckets[i];
          while(curr){
             list next = curr->next;
-            key_val *data = list_remove(curr, 0);
+            key_val *data;
+            m->buckets[i] = list_remove(curr, 0, (void **)&data);
             map_free_key_val(m, data);
             curr = next;
          }
@@ -125,7 +126,8 @@ int map_delete_key(map m, char *key){
    int i = 0;
    for(curr = m->buckets[hashv]; curr; curr = curr->next, i++){
       if(strcmp(key, ((key_val *)(curr->val))->key) == 0){
-         key_val *data = list_remove(m->buckets[hashv], i);
+         key_val *data;
+         m->buckets[hashv] = list_remove(m->buckets[hashv], i, (void **)&data);
          map_free_key_val(m, data);
          m->size--;
          return 1;

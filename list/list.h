@@ -16,6 +16,6 @@ int list_str_cmp(void *, void *);
 
 list list_insert(list head, void *val);
 list list_delete(list head, int index, list_free del);
-void *list_remove(list head, int index);
+list list_remove(list head, int index, void **data);
 list list_delete_all(list head, list_free del);
 int list_contains(list head, void *val, list_comparator cmp);
