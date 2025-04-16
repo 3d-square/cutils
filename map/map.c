@@ -43,9 +43,7 @@ int map_cmp(char *key, key_val *v2){
 key_val *map_put(map m, char *key, void *val){
    unsigned long hashv = hash(key) % MAPSIZE;
 
-   printf("map_put[%s]: bucket = %ld\n", key, hashv);
    if(m->buckets[hashv] == NULL){
-      printf("key: %s\n", key);
       key_val *keyval = alloc_key_val(key, val);
       m->buckets[hashv] = list_insert(NULL, keyval);
       m->size++;
@@ -53,18 +51,14 @@ key_val *map_put(map m, char *key, void *val){
    }
 
    list prev;
-   printf("here1\n");
    for(list curr = m->buckets[hashv]; curr; curr = curr->next){
       if(strcmp(key, node_get_key(curr)) == 0){
-         printf("update value\n");
          m->destruct(node_get_val(curr));
          node_get_val(curr) = val;
          return (key_val *)curr->val;
       }
-      printf("here2\n");
       prev = curr->prev;
    }
-   printf("here\n");
 
    key_val *keyval = alloc_key_val(key, val);
    
