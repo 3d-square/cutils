@@ -7,12 +7,13 @@
 #define node_get_val(node) (((key_val *)(node->val))->val)
 #define node_get_key(node) (((key_val *)(node->val))->key)
 
-long hash(char *s){
-   long hashv = 5381;
-   int c;
+unsigned long hash(char *s){
+   unsigned long hashv = 5381;
+   unsigned c;
    
-   while((c = *s++)){
+   while((c = *s)){
       hashv = ((hashv << 5) + hashv) + c;
+      s++;
    }
 
    return hashv;
@@ -40,9 +41,11 @@ int map_cmp(char *key, key_val *v2){
 }
 
 key_val *map_put(map m, char *key, void *val){
-   long hashv = hash(key) % MAPSIZE;
+   unsigned long hashv = hash(key) % MAPSIZE;
 
+   printf("map_put[%s]: bucket = %ld\n", key, hashv);
    if(m->buckets[hashv] == NULL){
+      printf("key: %s\n", key);
       key_val *keyval = alloc_key_val(key, val);
       m->buckets[hashv] = list_insert(NULL, keyval);
       m->size++;
@@ -50,14 +53,18 @@ key_val *map_put(map m, char *key, void *val){
    }
 
    list prev;
+   printf("here1\n");
    for(list curr = m->buckets[hashv]; curr; curr = curr->next){
       if(strcmp(key, node_get_key(curr)) == 0){
+         printf("update value\n");
          m->destruct(node_get_val(curr));
          node_get_val(curr) = val;
          return (key_val *)curr->val;
       }
+      printf("here2\n");
       prev = curr->prev;
    }
+   printf("here\n");
 
    key_val *keyval = alloc_key_val(key, val);
    
@@ -77,13 +84,13 @@ void delete_key_val(key_val *keyval){
 }
 
 int map_contains(map m, char *key){
-   long hashv = hash(key) % MAPSIZE;
+   unsigned long hashv = hash(key) % MAPSIZE;
 
    return list_contains(m->buckets[hashv], key, (list_comparator)map_cmp);
 }
 
 void *map_get(map m, char *key){
-   long hashv = hash(key) % MAPSIZE;
+   unsigned long hashv = hash(key) % MAPSIZE;
    
    list curr = m->buckets[hashv];
 
@@ -120,7 +127,7 @@ void map_destroy(map m){
 }
 
 int map_delete_key(map m, char *key){
-   long hashv = hash(key) % MAPSIZE;
+   unsigned long hashv = hash(key) % MAPSIZE;
 
    list curr;
    int i = 0;

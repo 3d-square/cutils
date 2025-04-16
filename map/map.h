@@ -24,7 +24,7 @@ typedef struct _m_iter{
    int finished;
 } map_iter;
 
-long hash(char *s);
+unsigned long hash(char *s);
 
 map map_create(void (*destruct)(void *)); 
 
