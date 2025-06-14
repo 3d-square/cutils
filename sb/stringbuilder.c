@@ -11,6 +11,10 @@ void sb_append_c(sb *builder, char c){
    assert(builder);
    assert(builder->string);
 
+   if(builder->size > 0 && builder->string[builder->size - 1] == 0){
+      builder->size--;
+   }
+
    if(builder->size + 1 > builder->capacity){
       builder->string = realloc(builder->string, builder->capacity * 2);
 
@@ -23,6 +27,13 @@ void sb_append_c(sb *builder, char c){
 
 void sb_append_s(sb *builder, char *s){
    assert(s);
+   assert(builder->string);
+   assert(strlen(s) > 0);
+
+   if(builder->string[builder->size - 1] == 0){
+      builder->size--;
+   }
+
    size_t s_len = strlen(s);
 
    if(builder->size + s_len > builder->capacity){
@@ -39,12 +50,12 @@ void sb_append_s(sb *builder, char *s){
 sb sb_from_str(char *s){
    sb builder;
    size_t s_len = strlen(s);
-   size_t init_len = s_len > 8 ? s_len : 8;
+   size_t init_len = s_len > 7 ? s_len + 1 : 8;
 
    builder.string = malloc(init_len * sizeof(char));
 
    assert(builder.string);
-   memset(builder.string, '\0', init_len);
+   memset(builder.string, '\0', init_len - 1);
 
    strncpy(builder.string, s, s_len);
    builder.capacity = init_len;
@@ -61,6 +72,8 @@ void sb_clear(sb *builder){
 void sb_free(sb *builder){
    assert(builder);
    free(builder->string);
+   builder->size = 0;
+   builder->capacity = 0;
 }
 
 void sb_print(sb *builder){
@@ -91,7 +104,6 @@ sb sb_get_word(const sb *builder, size_t start, char delim, size_t *spaceidx){
    word.string = string;
    word.capacity = word_len;
    word.size = word_len;
-
 
    return word;
 }
@@ -189,14 +201,23 @@ int sb_strequal(sb *builder, char *string, size_t size){
    return strncmp(builder->string, string, size) == 0;
 }
 
-char *sb_to_cstr(sb *builder){
+const char *sb_to_cstr(sb *builder){
    assert(builder);
 
-   char *sbascstr = malloc((builder->size + 1) * sizeof(char));
-   strncpy(sbascstr, builder->string, builder->size);
-   sbascstr[builder->size] = '\0';
+   if(builder->string[builder->size - 1] != '\0'){
+      sb_append_c(builder, '\0');
+   }
 
-   return sbascstr;
+   return builder->string;
+}
+
+const char *sb_str(const sb *builder, char *buffer, size_t buffer_len){
+   assert(builder);
+   size_t copy_size = builder->size > buffer_len - 1 ? buffer_len : builder->size;
+   strncpy(buffer, builder->string, copy_size);
+   buffer[copy_size] = '\0';
+
+   return buffer;
 }
 
 sb sb_read_file(const char *file_name){
@@ -234,7 +255,7 @@ sb *sb_read_lines(const char *file_name, size_t *list_length){
    
    sb_free(&file_contents);
    fclose(file);
-
+   
    return list;
 }
 

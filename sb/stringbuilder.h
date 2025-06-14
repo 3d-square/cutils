@@ -38,7 +38,9 @@ int sb_equal(sb *, sb *);
 
 int sb_strequal(sb *, char *, size_t);
 
-char *sb_to_cstr(sb *);
+const char *sb_to_cstr(sb *);
+
+const char *sb_str(const sb *, char *, size_t);
 
 sb sb_read_file(const char *);
 
