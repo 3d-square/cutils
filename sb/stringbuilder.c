@@ -11,9 +11,9 @@ void sb_append_c(sb *builder, char c){
    assert(builder);
    assert(builder->string);
 
-   if(builder->size > 0 && builder->string[builder->size - 1] == 0){
-      builder->size--;
-   }
+   // if(builder->size > 0 && builder->string[builder->size - 1] == 0){
+   //    builder->size--;
+   // }
 
    if(builder->size + 1 > builder->capacity){
       builder->string = realloc(builder->string, builder->capacity * 2);
@@ -23,6 +23,30 @@ void sb_append_c(sb *builder, char c){
    }
 
    builder->string[(builder->size)++] = c;
+}
+
+void sb_insert_c(sb *builder, char c, size_t index){
+   assert(builder);
+   assert(builder->string);
+
+   if(index > builder->size){
+      fprintf(stderr, "Index Out Of Bounds\n");
+      exit(1);
+   }
+
+   if(builder->size + 1 > builder->capacity){
+      builder->string = realloc(builder->string, builder->capacity * 2);
+
+      assert(builder->string);
+      builder->capacity *= 2;
+   }
+
+   for(size_t i = builder->size - 1; i > index && i < builder->size; --i){
+      builder->string[i] = builder->string[i - 1];
+   }
+
+   builder->string[index] = c;
+   builder->size++;
 }
 
 void sb_append_s(sb *builder, char *s){
@@ -50,14 +74,14 @@ void sb_append_s(sb *builder, char *s){
 sb sb_from_str(char *s){
    sb builder;
    size_t s_len = strlen(s);
-   size_t init_len = s_len > 7 ? s_len + 1 : 8;
+   size_t init_len = s_len > 8 ? s_len : 8;
 
-   builder.string = malloc(init_len * sizeof(char));
+   builder.string = malloc(init_len * sizeof(char) + 1);
 
    assert(builder.string);
    memset(builder.string, '\0', init_len - 1);
 
-   strncpy(builder.string, s, s_len);
+   strcpy(builder.string, s);
    builder.capacity = init_len;
    builder.size = s_len;
 
@@ -204,10 +228,13 @@ int sb_strequal(sb *builder, char *string, size_t size){
 const char *sb_to_cstr(sb *builder){
    assert(builder);
 
-   if(builder->string[builder->size - 1] != '\0'){
-      sb_append_c(builder, '\0');
+   if(builder->size >= builder->capacity - 1){
+      builder->string = realloc(builder->string, builder->capacity + 1);
+      assert(builder->string);
+      builder->capacity += 1;
    }
 
+   builder->string[builder->size] = '\0';
    return builder->string;
 }
 
@@ -298,4 +325,23 @@ long sb_indexof(const sb *builder, char c, size_t start){
       }
    }
    return index;
+}
+
+void sb_remove_c(sb *builder, size_t index){
+   assert(builder);
+   assert(builder->string);
+
+   if(index > builder->size){
+      fprintf(stderr, "Index Out Of Bounds ");
+      fprintf(stderr, "index = %lu, size = %lu\n", index, builder->size);
+      exit(1);
+   }
+
+   for(size_t i = index; i < builder->size; ++i){
+      builder->string[i] = builder->string[i + 1];
+   }
+
+   builder->size--;
+   printf("size = %lu\n", builder->size);
+   
 }

@@ -14,6 +14,10 @@ typedef struct _string{
 
 void sb_append_c(sb *, char);
 
+void sb_insert_c(sb *, char, size_t);
+
+void sb_remove_c(sb *, size_t);
+
 void sb_append_s(sb *, char *);
 
 sb sb_from_str(char *);
