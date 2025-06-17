@@ -184,6 +184,28 @@ sb *sb_split(const sb *builder, char delim, size_t *length){
    
 }
 
+void sb_concat(sb *s1, const sb *s2){
+   assert(s1);
+   assert(s1->string);
+   assert(s2);
+   assert(s2->string);
+
+   if(s1->capacity <= s1->size + s2->size){
+      // printf("reallocating...\n");
+      s1->string = realloc(s1->string, sizeof(char) * (s1->capacity + s2->size));
+
+      assert(s1->string);
+      s1->capacity += s2->size;
+   }
+
+   // printf("%*s + %*s\n", (int)s1->size, s1->string, (int)s2->size, s2->string);
+
+   strncpy(s1->string + s1->size, s2->string, s2->size); // Buffer is able to have all of s2 appended to it
+   s1->size += s2->size;
+
+   // printf("concated: %*s\n", (int)s1->size, s1->string);
+}
+
 void sb_free_list(sb *list, size_t length){
    assert(list);
 

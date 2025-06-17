@@ -18,6 +18,8 @@ void sb_insert_c(sb *, char, size_t);
 
 void sb_remove_c(sb *, size_t);
 
+void sb_concat(sb *, const sb *);
+
 void sb_append_s(sb *, char *);
 
 sb sb_from_str(char *);
