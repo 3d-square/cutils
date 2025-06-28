@@ -41,7 +41,7 @@ void sb_insert_c(sb *builder, char c, size_t index){
       builder->capacity *= 2;
    }
 
-   for(size_t i = builder->size - 1; i > index && i < builder->size; --i){
+   for(size_t i = builder->size; i > index && i <= builder->size; --i){
       builder->string[i] = builder->string[i - 1];
    }
 
@@ -364,6 +364,4 @@ void sb_remove_c(sb *builder, size_t index){
    }
 
    builder->size--;
-   printf("size = %lu\n", builder->size);
-   
 }
